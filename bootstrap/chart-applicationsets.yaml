@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: playground
+  namespace: argocd
+spec:
+  generators:
+  - git:
+      repoURL: "https://github.com/ErikLundJensen/course-playground.git"
+      revision: HEAD
+      files:
+      - path: "**/Chart.yaml"
+  template:
+    metadata:
+      name: '{{path.basename}}-{{annotations.preferredNamespace}}'
+      annotations:
+        # Only update application when commits relates this chart
+        argocd.argoproj.io/manifest-generate-paths: .
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: "https://github.com/ErikLundJensen/course-playground.git"
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        namespace: '{{annotations.preferredNamespace}}'
+        server: 'https://kubernetes.default.svc'
+      syncPolicy:
+        automated:
+          allowEmpty: true
+          prune: true
+          selfHeal: true
+        retry:
+          backoff:
+            duration: 30s
+            factor: 2
+            maxDuration: 10m
+          limit: 10
+        syncOptions:
+        - PrunePropagationPolicy=foreground
+        - ApplyOutOfSyncOnly=true
+        - PruneLast=true
