@@ -1,18 +1,31 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: playground
+  name: playground-manifests
   namespace: argocd
 spec:
   generators:
-  - git:
-      repoURL: "https://github.com/ErikLundJensen/course-playground.git"
-      revision: HEAD
-      directories:
-      - path: "user*/manifests"
+  - list:
+     elements:
+     - user: user-1
+     - user: user-2
+     - user: user-3
+     - user: user-4
+     - user: user-5
+     - user: user-6
+     - user: user-7
+     - user: user-8
+     - user: user-9
+     - user: user-10
+     - user: user-11
+     - user: user-12
+     - user: user-13
+     - user: user-14
+     - user: user-15
+     - user: user-16
   template:
     metadata:
-      name: '{{path.basename}}-application'
+      name: '{{user}}-application'
       annotations:
         # Only update application when commits relates this chart
         argocd.argoproj.io/manifest-generate-paths: .
@@ -23,9 +36,9 @@ spec:
       source:
         repoURL: "https://github.com/ErikLundJensen/course-playground.git"
         targetRevision: HEAD
-        path: '{{path}}'
+        path: '{{user}}/manifests'
       destination:
-        namespace: '{{path.basename}}'
+        namespace: '{{user}}'
         server: 'https://kubernetes.default.svc'
       syncPolicy:
         automated:
