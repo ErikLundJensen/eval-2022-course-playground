@@ -81,5 +81,3 @@ tolerations: []
 
 affinity: {}
 
-annotations:
-  preferredNamespace: "user-6"
