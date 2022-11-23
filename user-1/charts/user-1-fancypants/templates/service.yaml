@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "user-1-fancypants.fullname" . }}
+  labels:
+    {{- include "user-1-fancypants.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "user-1-fancypants.selectorLabels" . | nindent 4 }}
